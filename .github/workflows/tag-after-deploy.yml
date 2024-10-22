@@ -1,0 +1,57 @@
+name: Tag After CI Success
+
+on:
+  workflow_run:
+    workflows: ["Node.js CI"]
+    types:
+      - completed
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get the latest tag
+        id: get_tag
+        run: |
+          # Fetch tags from the repository
+          git fetch --tags
+          # Get the latest tag, if none exists default to v1.0.0
+          TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          if [ -z "$TAG" ]; then
+            echo "v1.0.0" > latest_version
+          else
+            echo "$TAG" > latest_version
+          fi
+
+      - name: Calculate new version
+        id: calculate_version
+        run: |
+          # Read the latest tag
+          LATEST_VERSION=$(cat latest_version)
+          # Extract major, minor, and patch
+          VERSION_REGEX="^v([0-9]+)\.([0-9]+)\.([0-9]+)$"
+          if [[ $LATEST_VERSION =~ $VERSION_REGEX ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+            PATCH="${BASH_REMATCH[3]}"
+            # Increment the minor version
+            NEW_PATCH=$((PATCH + 1))
+            NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          else
+            # Default to v1.0.0 if no valid version is found
+            NEW_VERSION="v1.0.0"
+          fi
+          echo "New version will be $NEW_VERSION"
+          echo "$NEW_VERSION" > new_version
+
+      - name: Create new tag
+        run: |
+          # Create a new tag with the calculated version
+          NEW_VERSION=$(cat new_version)
+          git tag "$NEW_VERSION"
+          git push origin "$NEW_VERSION"
+

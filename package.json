@@ -1,0 +1,19 @@
+{
+  "name": "mra-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest --detectOpenHandles --verbose --bail --config=src/config/jest.config.mjs"
+  },
+  "keywords": [],
+  "author": "Mahdi Jaberzadeh Ansari",
+  "license": "Copyright 2023-2024 ReportCycle Inc.",
+  "devDependencies": {
+    "@babel/core": "^7.25.9",
+    "@babel/preset-env": "^7.25.9",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0"
+  }
+}

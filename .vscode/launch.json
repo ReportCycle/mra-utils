@@ -1,0 +1,61 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug a Selected File",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${file}" // Select a file and then Run `Launch Selected File`
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Jest Tests",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+            "args": [
+                "--runInBand", // Runs all tests in a single process, important for debugging
+                "--detectOpenHandles",
+                "--verbose",
+                "--bail",
+                "--config=src/config/jest.config.mjs"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "NODE_ENV": "test"
+            },
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug a Selected Test File",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+            "args": [
+                "--coverage",
+                "--runInBand",
+                "--detectOpenHandles",
+                "--verbose",
+                "--bail",
+                "--config=src/config/jest.config.mjs",
+                "--testPathPattern",
+                "${fileBasename}"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "NODE_ENV": "test"
+            },
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ]
+        }
+    ]
+}

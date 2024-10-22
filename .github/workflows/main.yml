@@ -1,0 +1,50 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - "main"
+    tags-ignore:
+      - "**"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    env:
+      NODE_ENV: "test"
+      TZ: "UTC"
+      # Set environment variables from secrets
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      X_DEVELOPMENT_TOKEN: ${{ secrets.X_DEVELOPMENT_TOKEN }}
+      # Set environment variables from vars
+      
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+           
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests on GitHub
+        run: npm run github-test
