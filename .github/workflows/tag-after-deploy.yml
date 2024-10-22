@@ -54,12 +54,16 @@ jobs:
           echo "New version will be $NEW_VERSION"
           echo "$NEW_VERSION" > new_version
 
+          # Export the new version so it can be used in the next step
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
       - name: Tag the commit
+        if: env.NEW_VERSION != ''
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.MY_PAT }}
           script: |
-            const baseTagName = NEW_VERSION;
+            const baseTagName = process.env.NEW_VERSION;
             let tagName = baseTagName;
             try {
               // Attempt to fetch the tag to see if it already exists
