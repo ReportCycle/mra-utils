@@ -14,11 +14,6 @@ jobs:
   build:
     env:
       NODE_ENV: "test"
-      TZ: "UTC"
-      # Set environment variables from secrets
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      X_DEVELOPMENT_TOKEN: ${{ secrets.X_DEVELOPMENT_TOKEN }}
-      # Set environment variables from vars
       
     runs-on: ubuntu-latest
 
@@ -47,4 +42,4 @@ jobs:
         run: npm install
 
       - name: Run tests on GitHub
-        run: npm run github-test
+        run: npm run test
