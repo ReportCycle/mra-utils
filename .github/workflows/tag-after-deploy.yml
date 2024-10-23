@@ -12,9 +12,10 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Get the latest tag
+      - name: Fetch the latest tag
         id: get_tag
         run: |
           # Fetch tags from the repository
@@ -33,12 +34,21 @@ jobs:
             echo "$TAG" > latest_version
           fi
 
-      - name: Calculate new version
+      - name: Extract version from package.json
+        id: get_package_version
+        run: |
+          # Extract the version from package.json
+          PACKAGE_VERSION=$(jq -r '.version' package.json)
+          echo "Version from package.json: $PACKAGE_VERSION"
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+
+      - name: Calculate new version based on tags and package.json
         id: calculate_version
         run: |
-          # Read the latest tag
+          # Read the latest tag version
           LATEST_VERSION=$(cat latest_version)
-          # Extract major, minor, and patch
+
+          # Extract major, minor, and patch from latest tag
           VERSION_REGEX="^v([0-9]+)\.([0-9]+)\.([0-9]+)$"
           if [[ $LATEST_VERSION =~ $VERSION_REGEX ]]; then
             MAJOR="${BASH_REMATCH[1]}"
@@ -46,46 +56,68 @@ jobs:
             PATCH="${BASH_REMATCH[3]}"
             # Increment the patch version
             NEW_PATCH=$((PATCH + 1))
-            NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+            CALCULATED_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
           else
-            # Default to v1.0.0 if no valid version is found
-            NEW_VERSION="v1.0.0"
+            CALCULATED_VERSION="v1.0.0"
           fi
-          echo "New version will be $NEW_VERSION"
+
+          echo "Calculated version based on tags: $CALCULATED_VERSION"
+          
+          # Compare package.json version with calculated version
+          PACKAGE_VERSION=${{ env.PACKAGE_VERSION }}
+          if [ "$(printf '%s\n' "$PACKAGE_VERSION" "$CALCULATED_VERSION" | sort -V | head -n1)" != "$PACKAGE_VERSION" ]; then
+            NEW_VERSION=$CALCULATED_VERSION
+          else
+            NEW_VERSION=$PACKAGE_VERSION
+          fi
+          echo "Final version to use: $NEW_VERSION"
           echo "$NEW_VERSION" > new_version
 
           # Export the new version so it can be used in the next step
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Tag the commit
-        if: env.NEW_VERSION != ''
+        id: tag_commit
+        run: |
+          NEW_VERSION=$(cat new_version)
+          echo "Attempting to tag with $NEW_VERSION"
+
+          # Check if the tag already exists
+          TAG_EXISTS=$(git tag -l "$NEW_VERSION")
+
+          while [ -n "$TAG_EXISTS" ]; do
+            # If the tag exists, increment the patch number
+            echo "Tag $NEW_VERSION already exists, incrementing patch version..."
+            VERSION_REGEX="^v([0-9]+)\.([0-9]+)\.([0-9]+)$"
+            if [[ $NEW_VERSION =~ $VERSION_REGEX ]]; then
+              MAJOR="${BASH_REMATCH[1]}"
+              MINOR="${BASH_REMATCH[2]}"
+              PATCH="${BASH_REMATCH[3]}"
+              PATCH=$((PATCH + 1))
+              NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+            else
+              echo "Error parsing version."
+              exit 1
+            fi
+            echo "Trying new version: $NEW_VERSION"
+            TAG_EXISTS=$(git tag -l "$NEW_VERSION")
+          done
+
+          echo "Final tag to be used: $NEW_VERSION"
+          echo "$NEW_VERSION" > new_version
+
+      - name: Create the tag
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.MY_PAT }}
           script: |
-            const baseTagName = process.env.NEW_VERSION;
-            let tagName = baseTagName;
-            try {
-              // Attempt to fetch the tag to see if it already exists
-              await github.rest.git.getRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `tags/${tagName}`,
-              });
-              // If the tag exists, append a timestamp to make a unique tag
-              const date = new Date();
-              const timestamp = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-              tagName = `${baseTagName}.${timestamp}`;
-              console.log(`Base tag exists, new tag will be ${tagName}`);
-            } catch (error) {
-              // If the tag does not exist, the original tagName will be used
-              console.log(`Tag ${tagName} does not exist, proceeding to create it.`);
-            }
-      
-            // Create the tag with either the base name or the unique timestamped name
+            const newTag = process.env.NEW_VERSION;
+            console.log(`Creating tag: ${newTag}`);
+
+            // Create the tag with the final version
             await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/${tagName}`,
+              ref: `refs/tags/${newTag}`,
               sha: context.sha,
             });
