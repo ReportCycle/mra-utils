@@ -65,9 +65,12 @@ jobs:
           
           # Compare package.json version with calculated version
           PACKAGE_VERSION=${{ env.PACKAGE_VERSION }}
-          if [ "$(printf '%s\n' "$PACKAGE_VERSION" "$CALCULATED_VERSION" | sort -V | head -n1)" != "$PACKAGE_VERSION" ]; then
+          # Perform the version comparison
+          if [ "$(printf '%s\n' "$PACKAGE_VERSION" "$CALCULATED_VERSION" | sort -V | tail -n1)" = "$CALCULATED_VERSION" ]; then
+            # If the calculated version is greater, use the calculated version
             NEW_VERSION="v$CALCULATED_VERSION"
           else
+            # Otherwise, use the package.json version and add 'v' prefix
             NEW_VERSION="v$PACKAGE_VERSION"
           fi
           echo "Final version to use: $NEW_VERSION"
