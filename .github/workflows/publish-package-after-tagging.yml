@@ -1,0 +1,41 @@
+name: Publish Package After Tagging
+
+on:
+  workflow_run:
+    workflows: ["Tag After CI Success"]
+    types:
+      - completed
+
+  push:
+    tags:
+      - 'v*'  # This triggers on tags that follow the versioning format, like v1.0.1
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    if: |
+        github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set the version from tag
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "Updating package.json version to $TAG_NAME"
+          
+          # Update the version in package.json to match the tag
+          sed -i 's/"version": "[^"]*"/"version": "'$TAG_NAME'"/' package.json
+
+      - name: Show updated package.json (for debugging)
+        run: cat package.json
+
+      - name: Authenticate to GitHub Packages
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.MY_PAT }}" > ~/.npmrc
+
+      - name: Publish to GitHub Packages
+        run: npm publish
