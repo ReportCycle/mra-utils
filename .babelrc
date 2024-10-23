@@ -8,5 +8,14 @@
                 }
             }
         ]
+    ],
+    "plugins": [
+      [
+        "module-extension",
+        {
+          "mjs": "js"
+        }
+      ]
     ]
-}
+  }
+  
