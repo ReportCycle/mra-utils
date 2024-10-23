@@ -1,4 +1,4 @@
-import {getConfig} from '../config/config.mjs';
+import { getConfig } from '../config/config.mjs';
 
 /**
  * Pauses the execution for a specified amount of time.
@@ -40,7 +40,7 @@ export { isEmptyObject };
 
 /**
  * Retrieves the cryptographic configuration for encryption.
- * 
+ *
  * @returns {{ algorithm: string, secretKey: Buffer }} The cryptographic configuration object containing the algorithm and secret key.
  *
  * @throws {Error} If the secret key is not defined in the environment variables.

@@ -1,21 +1,20 @@
 {
-    "presets": [
-        [
-            "@babel/preset-env",
-            {
-                "targets": {
-                    "node": "current"
-                }
-            }
-        ]
-    ],
-    "plugins": [
-      [
-        "module-extension",
-        {
-          "mjs": "js"
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current"
         }
-      ]
+      }
     ]
-  }
-  
+  ],
+  "plugins": [
+    [
+      "module-extension",
+      {
+        "mjs": "js"
+      }
+    ]
+  ]
+}

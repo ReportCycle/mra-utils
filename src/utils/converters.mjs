@@ -42,7 +42,7 @@ const _hideSensitiveData = (obj, forbiddenProperties, visited = new WeakSet()) =
 
 /**
  * Encrypts a given text using AES-256-CTR encryption algorithm.
- * 
+ *
  * @param {string} text - The text to be encrypted.
  * @param {Buffer} [iv] - The initialization vector. If not provided, a random 16-byte IV is generated.
  * @returns {string} A base64 encoded string representing the encrypted text. Returns the original text if an error occurs.
@@ -66,7 +66,7 @@ export { encrypt };
 
 /**
  * Decrypts a base64 encoded string that was encrypted using the encrypt function.
- * 
+ *
  * @param {string} base64String - A base64 encoded string representing the encrypted text.
  * @returns {string} The decrypted text. Returns the original base64 string if an error occurs during decryption.
  */
@@ -87,7 +87,7 @@ export { decrypt };
 
 /**
  * Converts the keys of an object from snake_case to lowerCamelCase.
- * 
+ *
  * @param {Object} obj - The object whose keys need to be converted.
  * @returns {Object} A new object with all keys in lowerCamelCase.
  */
@@ -168,7 +168,7 @@ export { toSnakeCase };
 /**
  * Extracts key information from the Express request object and returns it as a JSON string.
  * Handles circular references in the object structure to ensure proper JSON serialization.
- * 
+ *
  * @param {object} req - The Express request object.
  * @returns {string} A JSON string representing key information from the request object.
  */

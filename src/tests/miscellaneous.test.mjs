@@ -1,5 +1,5 @@
+import { getConfig, setConfig } from '../config/config.mjs';
 import { getCreptoConfig, isEmptyObject, sleep } from '../utils/miscellaneous.mjs';
-import { setConfig, getConfig } from '../config/config.mjs';
 
 describe('Test functions in miscellaneous', () => {
 
@@ -86,7 +86,7 @@ describe('Test functions in miscellaneous', () => {
         });
 
         test('should return correct config when SECRET_KEY is defined', () => {
-            const modifiedConfig = {...getConfig(), secretKey: '1234567890abcdef1234567890abcdef'}
+            const modifiedConfig = { ...getConfig(), secretKey: '1234567890abcdef1234567890abcdef' }
             setConfig(modifiedConfig);
 
             // Act: Call the function
