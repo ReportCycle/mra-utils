@@ -10,11 +10,9 @@ import { getConfig } from '../config/config.mjs';
  * // Pauses execution for 1 second
  * await sleep(1000);
  */
-const sleep = (ms) => {
+export const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
-
-export { sleep };
 
 /**
  * Checks if an object is empty.
@@ -32,11 +30,9 @@ export { sleep };
  * const obj2 = { key: 'value' };
  * console.log(isEmptyObject(obj2)); // false
  */
-const isEmptyObject = (obj) => {
+export const isEmptyObject = (obj) => {
     return obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length === 0;
 };
-
-export { isEmptyObject };
 
 /**
  * Retrieves the cryptographic configuration for encryption.
@@ -45,7 +41,7 @@ export { isEmptyObject };
  *
  * @throws {Error} If the secret key is not defined in the environment variables.
  */
-const getCreptoConfig = () => {
+export const getCreptoConfig = () => {
     const algorithm = 'aes-256-ctr';
     const config = getConfig();
     const secretKeyHex = config.secretKey;
@@ -58,5 +54,3 @@ const getCreptoConfig = () => {
     const secretKey = Buffer.from(secretKeyHex, 'hex');
     return { algorithm, secretKey };
 };
-
-export { getCreptoConfig };

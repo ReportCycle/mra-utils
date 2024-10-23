@@ -4,20 +4,108 @@ import { getCreptoConfig, isEmptyObject, sleep } from './utils/miscellaneous.mjs
 
 // Grouping exports into categories
 export const config = {
+  /**
+   * Retrieves the current configuration object.
+   *
+   * @returns {Object} The current configuration object.
+   * @throws {Error} Will throw an error if the configuration has not been set.
+   */
   getConfig,
+  /**
+   * Sets the configuration for the application. This method can only be called once;
+   * subsequent attempts to set the configuration will throw an error.
+   *
+   * @param {Object} newConfig - The new configuration object.
+   * @param {string} newConfig.secretKey - The secret key required for encryption.
+   * @param {string} newConfig.developmentToken - The development token used for authentication or rate limits.
+   * @param {string} [newConfig.timezone='UTC'] - The timezone setting, defaults to 'UTC' if not provided.
+   * @throws {Error} Will throw an error if `secretKey` or `developmentToken` is not provided.
+   * @throws {Error} Will throw an error if the configuration has already been set.
+   */
   setConfig,
 };
 
 export const converters = {
+  /**
+   * Extracts key information from the Express request object and returns it as a JSON string.
+   * Handles circular references in the object structure to ensure proper JSON serialization.
+   *
+   * @param {object} req - The Express request object.
+   * @returns {string} A JSON string representing key information from the request object.
+   */
   convertRequestData,
+  /**
+   * Decrypts a base64 encoded string that was encrypted using the encrypt function.
+   *
+   * @param {string} base64String - A base64 encoded string representing the encrypted text.
+   * @returns {string} The decrypted text. Returns the original base64 string if an error occurs during decryption.
+   */
   decrypt,
+  /**
+   * Encrypts a given text using AES-256-CTR encryption algorithm.
+   *
+   * @param {string} text - The text to be encrypted.
+   * @param {Buffer} [iv] - The initialization vector. If not provided, a random 16-byte IV is generated.
+   * @returns {string} A base64 encoded string representing the encrypted text. Returns the original text if an error occurs.
+   */
   encrypt,
+  /**
+   * Converts the keys of an object from snake_case to lowerCamelCase.
+   *
+   * @param {Object} obj - The object whose keys need to be converted.
+   * @returns {Object} A new object with all keys in lowerCamelCase.
+   */
   toLowerCamelCase,
+  /**
+ * Converts the keys of an object from lowerCamelCase to snake_case.
+ *
+ * This function recursively converts all object keys to snake_case, where
+ * each word is separated by an underscore and all letters are in lowercase.
+ * It handles nested objects and arrays, ensuring that keys at every level
+ * are converted. Non-object values, including arrays, are left unchanged
+ * except for the recursive conversion of array items or object properties.
+ *
+ * @param {Object} obj - The object whose keys need to be converted to snake_case.
+ * @returns {Object} A new object with all keys in snake_case.
+ */
   toSnakeCase,
 };
 
 export const miscellaneous = {
+  /**
+   * Retrieves the cryptographic configuration for encryption.
+   *
+   * @returns {{ algorithm: string, secretKey: Buffer }} The cryptographic configuration object containing the algorithm and secret key.
+   *
+   * @throws {Error} If the secret key is not defined in the environment variables.
+   */
   getCreptoConfig,
+  /**
+   * Checks if an object is empty.
+   *
+   * An object is considered empty if it has no own enumerable properties.
+   *
+   * @param {Object} obj - The object to check.
+   * @returns {boolean} Returns `true` if the object is empty, otherwise `false`.
+   *
+   * @example
+   *
+   * const obj1 = {};
+   * console.log(isEmptyObject(obj1)); // true
+   *
+   * const obj2 = { key: 'value' };
+   * console.log(isEmptyObject(obj2)); // false
+   */
   isEmptyObject,
+  /**
+   * Pauses the execution for a specified amount of time.
+   *
+   * @param {number} ms - The number of milliseconds to pause.
+   * @returns {Promise<void>} A promise that resolves after the specified time has elapsed.
+   *
+   * @example
+   * // Pauses execution for 1 second
+   * await sleep(1000);
+   */
   sleep,
 };

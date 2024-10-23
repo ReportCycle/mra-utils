@@ -47,7 +47,7 @@ const _hideSensitiveData = (obj, forbiddenProperties, visited = new WeakSet()) =
  * @param {Buffer} [iv] - The initialization vector. If not provided, a random 16-byte IV is generated.
  * @returns {string} A base64 encoded string representing the encrypted text. Returns the original text if an error occurs.
  */
-const encrypt = (text, iv) => {
+export const encrypt = (text, iv) => {
     try {
         const config = getCreptoConfig();
         iv = iv != null ? iv : randomBytes(16);
@@ -62,15 +62,13 @@ const encrypt = (text, iv) => {
     }
 };
 
-export { encrypt };
-
 /**
  * Decrypts a base64 encoded string that was encrypted using the encrypt function.
  *
  * @param {string} base64String - A base64 encoded string representing the encrypted text.
  * @returns {string} The decrypted text. Returns the original base64 string if an error occurs during decryption.
  */
-const decrypt = (base64String) => {
+export const decrypt = (base64String) => {
     try {
         const config = getCreptoConfig();
         const jsonString = Buffer.from(base64String, 'base64').toString('utf-8');
@@ -83,15 +81,13 @@ const decrypt = (base64String) => {
     }
 };
 
-export { decrypt };
-
 /**
  * Converts the keys of an object from snake_case to lowerCamelCase.
  *
  * @param {Object} obj - The object whose keys need to be converted.
  * @returns {Object} A new object with all keys in lowerCamelCase.
  */
-const toLowerCamelCase = (obj) => {
+export const toLowerCamelCase = (obj) => {
     const convertKey = (key) => key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
 
     const processValue = (value) => {
@@ -120,8 +116,6 @@ const toLowerCamelCase = (obj) => {
     }, {});
 };
 
-export { toLowerCamelCase };
-
 /**
  * Converts the keys of an object from lowerCamelCase to snake_case.
  *
@@ -134,7 +128,7 @@ export { toLowerCamelCase };
  * @param {Object} obj - The object whose keys need to be converted to snake_case.
  * @returns {Object} A new object with all keys in snake_case.
  */
-const toSnakeCase = (obj) => {
+export const toSnakeCase = (obj) => {
     const convertKey = (key) => key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 
     const processValue = (value) => {
@@ -163,8 +157,6 @@ const toSnakeCase = (obj) => {
     }, {});
 };
 
-export { toSnakeCase };
-
 /**
  * Extracts key information from the Express request object and returns it as a JSON string.
  * Handles circular references in the object structure to ensure proper JSON serialization.
@@ -172,7 +164,7 @@ export { toSnakeCase };
  * @param {object} req - The Express request object.
  * @returns {string} A JSON string representing key information from the request object.
  */
-const convertRequestData = (req) => {
+export const convertRequestData = (req) => {
     // Array of properties to hide
     const forbiddenProperties = ['password', 'token', 'email', 'firstName', 'middleName', 'lastName', 'dateOfBirth', 'profilePictureUrl', 'profilePictureThumbnailUrl'];
 
@@ -192,5 +184,3 @@ const convertRequestData = (req) => {
 
     return requestData;
 };
-
-export { convertRequestData };
