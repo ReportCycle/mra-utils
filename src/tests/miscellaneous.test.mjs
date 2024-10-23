@@ -1,4 +1,4 @@
-import { getConfig, setConfig } from '../config/config.mjs';
+import { getConfig } from '../config/config.mjs';
 import { getCreptoConfig, isEmptyObject, sleep } from '../utils/miscellaneous.mjs';
 
 describe('Test functions in miscellaneous', () => {
@@ -78,24 +78,16 @@ describe('Test functions in miscellaneous', () => {
 
 
     describe('getCreptoConfig', () => {
-        const originalConfig = getConfig();
-
-        beforeEach(() => {
-            jest.resetModules(); // Clear module cache
-            setConfig(originalConfig); // Copy original environment variables
-        });
-
         test('should return correct config when SECRET_KEY is defined', () => {
-            const modifiedConfig = { ...getConfig(), secretKey: '1234567890abcdef1234567890abcdef' }
-            setConfig(modifiedConfig);
 
-            // Act: Call the function
+            const originalConfig = getConfig();
+
             const config = getCreptoConfig();
 
             // Assert: Verify the configuration
             expect(config).toEqual({
                 algorithm: 'aes-256-ctr',
-                secretKey: Buffer.from('1234567890abcdef1234567890abcdef', 'hex')
+                secretKey: Buffer.from(originalConfig.secretKey, 'hex')
             });
         });
     });

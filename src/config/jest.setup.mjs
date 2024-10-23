@@ -11,3 +11,15 @@ test('Config variable should be loaded', () => {
     expect(config.secretKey).toBeDefined();
     expect(config.developmentToken).toBeDefined();
 });
+
+describe('setConfig', () => {
+    test('should arise an error "Config has already been set."', () => {
+        // Attempt to modify the config after it has already been set
+        const modifiedConfig = { ...getConfig(), secretKey: '1234567890abcdef1234567890abcdef' };
+
+        // Expect setConfig to throw an error when called again
+        expect(() => {
+            setConfig(modifiedConfig);
+        }).toThrow('Config has already been set.');
+    });
+});
