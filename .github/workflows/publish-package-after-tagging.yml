@@ -10,9 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Install dependencies (for building the project)
+      - name: Install dependencies
+        run: npm install
+
+      # Step 3: Build the project (transpile ES6 to CommonJS using Babel)
+      - name: Build the project
+        run: npm run build  
+
+      # Step 4: Set the version from the tag
       - name: Set the version from tag
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
@@ -25,11 +35,21 @@ jobs:
           # Update the version in package.json to match the tag (without 'v' prefix)
           sed -i 's/"version": "[^"]*"/"version": "'$VERSION'"/' package.json
 
-      - name: Show updated package.json (for debugging)
-        run: cat package.json
+      # Step 5: Modify package.json for CommonJS (after build)
+      - name: Modify package.json for CommonJS
+        run: |
+          echo "Updating package.json for CommonJS"
+          sed -i 's/"main": "src\/index.mjs"/"main": "lib\/index.js"/' package.json
+          sed -i 's/"type": "module"/"type": "commonjs"/' package.json    
 
+      # Step 6: Show updated package.json for debugging
+      - name: Show updated package.json
+        run: cat package.json     
+
+      # Step 6: Authenticate to GitHub Packages
       - name: Authenticate to GitHub Packages
         run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.MY_PAT }}" > ~/.npmrc
 
+      # Step 7: Publish the build (from lib folder) to GitHub Packages
       - name: Publish to GitHub Packages
         run: npm publish
