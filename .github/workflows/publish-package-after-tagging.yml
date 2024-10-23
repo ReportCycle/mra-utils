@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set the version from tag
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
           echo "Updating package.json version to $TAG_NAME"
