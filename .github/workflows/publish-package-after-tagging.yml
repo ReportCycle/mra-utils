@@ -16,10 +16,14 @@ jobs:
       - name: Set the version from tag
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
-          echo "Updating package.json version to $TAG_NAME"
+
+          # Remove the leading 'v' if present
+          VERSION=${TAG_NAME#v}
+
+          echo "Updating package.json version to $VERSION"
           
-          # Update the version in package.json to match the tag
-          sed -i 's/"version": "[^"]*"/"version": "'$TAG_NAME'"/' package.json
+          # Update the version in package.json to match the tag (without 'v' prefix)
+          sed -i 's/"version": "[^"]*"/"version": "'$VERSION'"/' package.json
 
       - name: Show updated package.json (for debugging)
         run: cat package.json
