@@ -13,8 +13,9 @@
     [
       "module-extension",
       {
-        "mjs": "js"
+        "mjs": "js" // update mjs refrences in required statements
       }
     ]
-  ]
+  ],
+  "comments": true // Preserve comments, including JSDoc
 }
