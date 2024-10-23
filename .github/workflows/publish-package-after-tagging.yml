@@ -1,10 +1,9 @@
 name: Publish Package After Tagging
 
 on:
-  workflow_run:
-    workflows: ["Tag After CI Success"]
-    types:
-      - completed
+  push:
+    tags:
+      - 'v*'  # This triggers on tags that follow the versioning format, like v1.0.1
 
 jobs:
   publish:
@@ -15,7 +14,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set the version from tag
-        if: startsWith(github.ref, 'refs/tags/')
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
           echo "Updating package.json version to $TAG_NAME"
