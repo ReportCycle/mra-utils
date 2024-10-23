@@ -1,5 +1,5 @@
 {
-  "name": "mra-utils",
+  "name": "@reportcycle/mra-utils",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
@@ -7,9 +7,12 @@
   "scripts": {
     "test": "jest --detectOpenHandles --verbose --bail --config=src/config/jest.config.mjs"
   },
-  "keywords": [],
+  "keywords": ["utilities", "github-packages", "mra-utils"],
   "author": "Mahdi Jaberzadeh Ansari",
   "license": "Copyright 2023-2024 ReportCycle Inc.",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "devDependencies": {
     "@babel/core": "^7.25.9",
     "@babel/preset-env": "^7.25.9",
