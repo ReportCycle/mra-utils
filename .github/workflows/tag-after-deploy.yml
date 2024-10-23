@@ -68,7 +68,7 @@ jobs:
           if [ "$(printf '%s\n' "$PACKAGE_VERSION" "$CALCULATED_VERSION" | sort -V | head -n1)" != "$PACKAGE_VERSION" ]; then
             NEW_VERSION=$CALCULATED_VERSION
           else
-            NEW_VERSION=$PACKAGE_VERSION
+            NEW_VERSION="v$PACKAGE_VERSION"
           fi
           echo "Final version to use: $NEW_VERSION"
           echo "$NEW_VERSION" > new_version
