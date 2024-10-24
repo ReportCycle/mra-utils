@@ -2,28 +2,30 @@ import { getConfig, setConfig } from './config/config.mjs';
 import { convertRequestData, decrypt, encrypt, toLowerCamelCase, toSnakeCase } from './utils/converters.mjs';
 import { getCreptoConfig, isEmptyObject, sleep } from './utils/miscellaneous.mjs';
 
-// Grouping exports into categories
-export const config = {
+export const utils = {
   /**
-   * Retrieves the current configuration object.
+   * Config function that acts as both a getter and a setter.
    *
-   * @returns {Object} The current configuration object.
-   * @throws {Error} Will throw an error if the configuration has not been set.
+   * @param {Object} [newConfig] - The new configuration object. If provided, it sets the configuration.
+   * If not provided, it retrieves the current configuration.
+   * @param {string} newConfig.secretKey - The secret key required for encryption (when setting config).
+   * @param {string} newConfig.developmentToken - The development token used for authentication or rate limits (when setting config).
+   * @param {string} [newConfig.timezone='UTC'] - The timezone setting, defaults to 'UTC' if not provided (when setting config).
+   * @returns {Object} The current configuration object (when getting config).
+   * @throws {Error} Will throw an error if the configuration is not set (when getting config).
+   * @throws {Error} Will throw an error if required properties are missing when setting config.
    */
-  getConfig,
-  /**
-   * Sets the configuration for the application. This method can only be called once;
-   * subsequent attempts to set the configuration will throw an error.
-   *
-   * @param {Object} newConfig - The new configuration object.
-   * @param {string} newConfig.secretKey - The secret key required for encryption.
-   * @param {string} newConfig.developmentToken - The development token used for authentication or rate limits.
-   * @param {string} [newConfig.timezone='UTC'] - The timezone setting, defaults to 'UTC' if not provided.
-   * @throws {Error} Will throw an error if `secretKey` or `developmentToken` is not provided.
-   * @throws {Error} Will throw an error if the configuration has already been set.
-   */
-  setConfig,
+  config: (newConfig) => {
+    if (!newConfig) {
+      // Get configuration
+      return getConfig();
+    } else {
+      // Set configuration
+      return setConfig(newConfig);
+    }
+  },
 };
+
 
 export const converters = {
   /**
