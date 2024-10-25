@@ -14,7 +14,7 @@ jobs:
   build:
     env:
       NODE_ENV: "test"
-      
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -22,13 +22,16 @@ jobs:
         node-version: [20.x]
 
     steps:
+      # Step 0: Load the source code
       - uses: actions/checkout@v4
 
+      # Step 1: Set the node js
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
+      # Step 2: Load cashes if there is any
       - name: Cache node modules
         uses: actions/cache@v4
         with:
@@ -36,9 +39,33 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-           
+
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
+      # Step 4: Test source file
       - name: Run tests on GitHub
         run: npm run test
+
+      # Step 5: Build the project
+      - name: Build project
+        run: npm run build
+
+      # Step 6: Modify package.json for CommonJS (after build)
+      - name: Modify package.json for CommonJS
+        run: |
+          echo "Updating package.json for CommonJS"
+          sed -i 's/"main": "src\/index.mjs"/"main": "lib\/index.js"/' package.json
+          sed -i 's/"type": "module"/"type": "commonjs"/' package.json
+
+      # Step 7: Run tests on built code in CommonJS mode
+      - name: Run tests on built code
+        run: npm run test:build
+
+      # Step 8: Restore package.json to original module state
+      - name: Restore package.json to original state
+        run: |
+          echo "Restoring package.json to original state"
+          sed -i 's/"main": "lib\/index.js"/"main": "src\/index.mjs"/' package.json
+          sed -i 's/"type": "commonjs"/"type": "module"/' package.json
