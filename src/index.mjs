@@ -1,6 +1,7 @@
 import { getConfig, setConfig } from './config/config.mjs';
 import { convertRequestData, decrypt, decryptObjectItems, encrypt, encryptObjectItems, toLowerCamelCase, toSnakeCase } from './utils/converters.mjs';
 import { getCreptoConfig, isEmptyObject, sleep } from './utils/miscellaneous.mjs';
+import { checkJSONBody, checkRequestValidity, isValidEmail, isValidUrl, testUrlAccessibility } from './utils/validations.mjs';
 
 export const utils = {
   /**
@@ -24,6 +25,72 @@ export const utils = {
       return setConfig(newConfig);
     }
   },
+};
+
+export const validations = {
+  /**
+   * Middleware to handle and respond to invalid JSON format errors.
+   * This middleware captures `SyntaxError` thrown by the `express.json()` middleware
+   * when the incoming request contains invalid JSON. It extracts useful information
+   * about the error, including the error type, message, and position where the error
+   * occurred in the JSON string, and sends a detailed response back to the client.
+   *
+   * @param {object} err - The error object thrown by `express.json()` when it encounters malformed JSON.
+   * @param {object} req - The request object from Express.js containing the client's request data.
+   * @param {object} res - The response object from Express.js used to send back the desired HTTP response.
+   * @param {function} next - The callback function to pass control to the next middleware function.
+   *
+   * @returns {void|object} - Sends a 400 error response with details if the error is a `SyntaxError`.
+   *                          Otherwise, passes control to the next middleware.
+   *
+   * @example
+   * // Usage as part of the Express middleware stack:
+   * app.use(express.json());
+   * app.use(checkJSONBody);
+   */
+  checkJSONBody,
+
+  /**
+   * Middleware to validate request data using validationResult.
+   * It checks if the request meets the validation criteria set by previous validation middlewares.
+   * If the validation fails, it sends a 400 status code with the validation errors.
+   * Otherwise, it passes control to the next middleware function in the stack.
+   *
+   * @param {object} req - The request object from Express.js containing the client's request data.
+   * @param {object} res - The response object from Express.js used to send back the desired HTTP response.
+   * @param {function} next - The callback function to pass control to the next middleware function.
+   */
+  checkRequestValidity,
+
+  /**
+   * Function to validate an email address format.
+   * It uses a regular expression to check if the email follows the standard email format.
+   *
+   * @param {string} email - The email address to validate.
+   * @returns {boolean} - Returns true if the email is valid, otherwise false.
+   *
+   * @example
+   * isValidEmail('test@example.com'); // true
+   * isValidEmail('invalid-email'); // false
+   */
+  isValidEmail,
+
+  /**
+   * Validates whether the given input is a well-formed URL.
+   *
+   * @param {string} inputUrl - The URL to validate.
+   * @returns {boolean} True if the input is a valid URL, false otherwise.
+   */
+  isValidUrl,
+
+  /**
+   * Tests if a given URL is accessible by making a HEAD request.
+   *
+   * @async
+   * @param {string} url - The URL to test for accessibility.
+   * @returns {Promise<boolean>} True if the URL is accessible, false otherwise.
+   */
+  testUrlAccessibility
 };
 
 
