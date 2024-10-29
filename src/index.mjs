@@ -1,5 +1,5 @@
 import { getConfig, setConfig } from './config/config.mjs';
-import { convertRequestData, decrypt, encrypt, toLowerCamelCase, toSnakeCase } from './utils/converters.mjs';
+import { convertRequestData, decrypt, decryptObjectItems, encrypt, encryptObjectItems, toLowerCamelCase, toSnakeCase } from './utils/converters.mjs';
 import { getCreptoConfig, isEmptyObject, sleep } from './utils/miscellaneous.mjs';
 
 export const utils = {
@@ -51,6 +51,26 @@ export const converters = {
    * @returns {string} A base64 encoded string representing the encrypted text. Returns the original text if an error occurs.
    */
   encrypt,
+
+  /**
+   * Decrypts all string values within an object that were encrypted using encryptObjectItems.
+   *
+   * @param {Object} obj - The object with encrypted string values.
+   * @param {string[]} [propertiesToDecrypt] - List of property names to decrypt. If not provided, all string properties are decrypted.
+   * @returns {Object} A new object with all string values decrypted. Non-string values are copied as is.
+   */
+  decryptObjectItems,
+
+  /**
+   * Encrypts all string values within an object.
+   *
+   * @param {Object} obj - The object whose string values are to be encrypted.
+   * @param {string[]} [propertiesToEncrypt] - List of property names to encrypt. If not provided, all string properties are encrypted.
+   * @param {Buffer} [iv] - The initialization vector for encryption. If not provided, a random 16-byte IV is generated.
+   * @returns {Object} A new object with all string values encrypted. Non-string values are copied as is.
+   */
+  encryptObjectItems,
+
   /**
    * Converts the keys of an object from snake_case to lowerCamelCase.
    *

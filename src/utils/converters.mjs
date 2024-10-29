@@ -82,6 +82,85 @@ export const decrypt = (base64String) => {
 };
 
 /**
+ * Encrypts all string values within an object.
+ *
+ * @param {Object} obj - The object whose string values are to be encrypted.
+ * @param {string[]} [propertiesToEncrypt] - List of property names to encrypt. If not provided, all string properties are encrypted.
+ * @param {Buffer} [iv] - The initialization vector for encryption. If not provided, a random 16-byte IV is generated.
+ * @returns {Object} A new object with all string values encrypted. Non-string values are copied as is.
+ */
+export const encryptObjectItems = (obj, propertiesToEncrypt, iv) => {
+    // Check if the input is an array and handle it accordingly
+    if (Array.isArray(obj)) {
+        return obj.map(item => encryptObjectItems(item, propertiesToEncrypt, iv));
+    }
+    // Proceed if the input is an object
+    else if (obj !== null && typeof obj === 'object') {
+        const keys = Object.keys(obj);
+        if (keys.length > 0) {
+            const convertedObject = {};
+            for (let key of keys) {
+                if (obj.hasOwnProperty(key)) {
+                    // Check if the current item should be encrypted
+                    const shouldEncrypt = typeof obj[key] === 'string' && (!propertiesToEncrypt || propertiesToEncrypt.includes(key));
+                    if (shouldEncrypt) {
+                        convertedObject[key] = encrypt(obj[key], iv); // Encrypt the string value
+                    } else {
+                        // Recursively apply to nested objects or arrays, or copy other values as is
+                        convertedObject[key] = encryptObjectItems(obj[key], propertiesToEncrypt, iv);
+                    }
+                }
+            }
+            return convertedObject;
+        }
+        else {
+            return obj;
+        }
+    }
+    // Return non-object and non-array values unchanged
+    return obj;
+};
+
+/**
+ * Decrypts all string values within an object that were encrypted using encryptObjectItems.
+ *
+ * @param {Object} obj - The object with encrypted string values.
+ * @param {string[]} [propertiesToDecrypt] - List of property names to decrypt. If not provided, all string properties are decrypted.
+ * @returns {Object} A new object with all string values decrypted. Non-string values are copied as is.
+ */
+export const decryptObjectItems = (obj, propertiesToDecrypt) => {
+    // Check if the input is an array and handle it accordingly
+    if (Array.isArray(obj)) {
+        return obj.map(item => decryptObjectItems(item, propertiesToDecrypt));
+    }
+    // Proceed if the input is an object
+    else if (obj !== null && typeof obj === 'object') {
+        const keys = Object.keys(obj);
+        if (keys.length > 0) {
+            const convertedObject = {};
+            for (let key of keys) {
+                if (obj.hasOwnProperty(key)) {
+                    // Check if the current item should be decrypted
+                    const shouldDecrypt = typeof obj[key] === 'string' && (!propertiesToDecrypt || propertiesToDecrypt.includes(key));
+                    if (shouldDecrypt) {
+                        convertedObject[key] = decrypt(obj[key]); // Decrypt the string value
+                    } else {
+                        // Recursively apply to nested objects or arrays, or copy other values as is
+                        convertedObject[key] = decryptObjectItems(obj[key], propertiesToDecrypt);
+                    }
+                }
+            }
+            return convertedObject;
+        }
+        else {
+            return obj;
+        }
+    }
+    // Return non-object and non-array values unchanged
+    return obj;
+};
+
+/**
  * Converts the keys of an object from snake_case to lowerCamelCase.
  *
  * @param {Object} obj - The object whose keys need to be converted.
